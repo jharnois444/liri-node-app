@@ -16,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/jharnois444/liri-node-app/issues"
   },
-  "homepage": "https://github.com/jharnois444/liri-node-app#readme"
+  "homepage": "https://github.com/jharnois444/liri-node-app#readme",
+  "dependencies": {
+    "deep-extend": "^0.5.0",
+    "node-spotify-api": "^1.0.7",
+    "request": "^2.85.0"
+  }
 }
