@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 // Dependencies/Linked Files
-const Twitter = require('twitter'),
+var Twitter = require('twitter'),
     Spotify = require('node-spotify-api'),
     inquirer = require('inquirer'),
     request = require('request'),
@@ -10,11 +10,15 @@ const Twitter = require('twitter'),
     spotify = new Spotify(keys.spotify),
     client = new Twitter(keys.twitter)
     params = { screen_name: 'jharnois444'};
+    movieName = process.argv[3];
+    liriReturn = process.argv[2];
 
 // Make it so liri.js can take in one of the following commands:
 
+
+
 // my-tweets
-switch (command) {
+switch (liriReturn) {
     case 'my-tweets':
         myTweets()
         break
@@ -37,15 +41,16 @@ switch (command) {
         break
 }
 
+
 // Display most recent 20 tweets
-function getTweets () { 
+function myTweets() { 
     client.get("statuses/user_timeline", params, function (error, tweets, response) {
         if (!error) {
-            tweets.forEach(tweet => {
-                console.log("-----------")
-                console.log(tweet.text)
-                console.log("Tweet written on " + tweet.created_at)
-            })
+            for (var i = 0; i < tweets.length; i++) {
+                console.log(tweets[i].text);
+            };
+            } else{
+                console.log("error: " + err)
         }
     })
 }
