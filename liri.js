@@ -1,38 +1,36 @@
 require('dotenv').config();
 
 // Dependencies/Linked Files
- const spotify = new Spotify(keys.spotify);
- const client = new Twitter(keys.twitter);
- const keys = require('./keys.js');
+const Twitter = require('twitter'),
+    Spotify = require('node-spotify-api'),
+    inquirer = require('inquirer'),
+    request = require('request'),
+    fs = require('fs'),
+    keys = require('./keys.js'),
+    spotify = new Spotify(keys.spotify),
+    client = new Twitter(keys.twitter)
+    params = { screen_name: 'jharnois444'};
 
- const Twitter = require('twitter');
- const request = require('request');
- const inquirer = require('inquirer');
- const Spotify = require('node-spotify-api');
- const fs = require('fs');
-    
-
-
-//     Make it so liri.js can take in one of the following commands:
+// Make it so liri.js can take in one of the following commands:
 
 // my-tweets
 switch (command) {
     case 'my-tweets':
-        showTweets()
+        myTweets()
         break
 
 // spotify-this-song
     case 'spotify-this-song':
-        spotifySpng(parameter || DEFAULT_SONG)
+        spotifyThisSong()
         break
         
 // movie-this
     case 'movie-this':
-        omdbMovie(parameter || DEFAULT_MOVIE)
+        movieThis()
         break
 // do-what-it-says
     case 'do-what-it-says':
-        performTaskFromFile()
+        doWhatItSays()
         break
     default:
         console.log("{Please enter a command: my-tweets, spotify-this-song, movie-this, do-what-it-says");
@@ -40,20 +38,16 @@ switch (command) {
 }
 
 // Display most recent 20 tweets
-function showTweets() {
-    client.get('statuses/user_timeline', TWEET_PARAMS,
-        function(error, tweets, response) {
-            if (!error) {
-                tweets.forEach(tweet => {
-                    log(SEPARATOR)
-                    log(tweet.text)
-                    log('Tweeted on %s'.dim, moment(tweet.created_at, TWITTER_DATE_FORMAT).format(OUTPUT_DATE_FORMAT))
-                })
-                log(SEPARATOR)
-            }
-            promptToContinue()
+function getTweets () { 
+    client.get("statuses/user_timeline", params, function (error, tweets, response) {
+        if (!error) {
+            tweets.forEach(tweet => {
+                console.log("-----------")
+                console.log(tweet.text)
+                console.log("Tweet written on " + tweet.created_at)
+            })
         }
-    )
+    })
 }
 
 
