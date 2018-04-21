@@ -59,3 +59,18 @@ function myTweets() {
 
 // function spotifySong(songName)
 //     spoify.search({ type: 'artist OR album OR track', query: 'My search query', limit: 20 }, callback);
+
+
+
+// var songName = (process.argv[2] = "spotify-this-song" && process.argv[3]) ? process.argv[3] : "The Sign Ace of Base"
+
+function spotifyThisSong() {
+    spotify
+    .search({ type: 'track', query: 'All the Small Things' })
+    .then(function(response) {
+      console.log(response);
+    })
+    .catch(function(err) {
+      console.log(err);
+    });
+}
