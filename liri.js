@@ -13,95 +13,113 @@ var Twitter = require('twitter'),
     movieName = process.argv[3];
     liriReturn = process.argv[2];
 
-// Make it so liri.js can take in one of the following commands:
-
-/**
- * Capture User Input
- * @param {string} liriReturn Commands: my-tweets, spotify-this-song, movie-this, do-what-it-says
- * @param {string} parameter Optional input
- */
-
-function userInput(liriReturn, parameter) {
-    if (liriReturn) {
-        log('Processing %s command', liriReturn)
-    }
-
-// my-tweets
-switch (liriReturn) {
-    case 'my-tweets':
-        myTweets()
-        break
-
-// spotify-this-song
-    case 'spotify-this-song':
-        spotifyThisSong()
-        break
-        
-// movie-this
-    case 'movie-this':
-        movieThis()
-        break
-// do-what-it-says
-    case 'do-what-it-says':
-        doWhatItSays()
-        break
-    default:
-        console.log("{Please enter a command: my-tweets, spotify-this-song, movie-this, do-what-it-says");
-        break
+// Display 20 most recent tweets when twitter function is called
+var myTweets = function() {
+    client.get('statuses/user_timeline', params, function(error, tweets, response){
+        for (var i = 0; i < tweets.length; i++) {
+            console.log(tweets[i].created_at);
+            console.log(' ');
+            console.log(tweets[i].text);
+        };
+    });
 }
 
 
-// Display most recent 20 tweets
-function myTweets() { 
-    client.get("statuses/user_timeline", params, function (error, tweets, response) {
-        if (!error) {
-            for (var i = 0; i < tweets.length; i++) {
-                console.log(tweets[i].text);
-            };
-            } else{
-                console.log("error: " + err)
+var getArtistNames = function(artist) {
+    return artist.name;
+}
+
+// Spotify search
+var spotifyThisSong = function(songName) {
+
+    spotify.search({ type: 'track', query: songName }
+    , function(err, data) {
+        if (err) {
+            console.log('Error occurred: ' + err);
+            return;
+        }
+
+        var songs = data.tracks.items;
+        for (var i = 0; i < songs.length; i++) {
+            console.log(i);
+            console.log('artist(s): ' + songs[i].artists.map(
+                getArtistNames));
+            console.log('song name: ' + songs[i].name);
+            console.log('preview song: ' + songs[i].preview_url);
+            console.log('album: ' + songs[i].album.name);
+            console.log('---------------------------------');
+        }
+    });
+}
+
+
+var movieThis = function(movieName) {
+
+
+request('http://www.omdbapi.com/?t=' + movieName + '&y=&plot=short&r=json', 
+    function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+
+            var jsonData = JSON.parse(body);
+
+            console.log('Title: ' + jsonData.Title);
+            console.log('Year: ' + jsonData.Year);
+            console.log('Rated: ' + jsonData.Rated);
+            console.log('IMDB Rating: ' + jsonData.imdbRating);
+            console.log('Country: ' + jsonData.Country);
+            console.log('Language: ' + jsonData.Language);
+            console.log('Plot: ' + jsonData.Plot);
+            console.log('Actors: ' + jsonData.Actors);
+            console.log('Rotten tomatoes rating: ' + jsonData.tomatoRating);
+            console.log('Rotten tomatoes URL: ' + jsonData.tomatoURL);
         }
     })
 }
 
-function spotifyThisSong() {
-    spotify
-    .search({ type: 'track', query: 'All the Small Things' })
-    .then(function(response) {
-      console.log(response);
-    })
-    .catch(function(err) {
-      console.log(err);
-    });
+var doWhatItSays = function() {
+    fs.readFile('random.txt'), 'utf8', function (err, data) {
+        if(err) throw err;
+        
+        var dataArr = data.split(',');
+
+        if (dataArr.length ==2) {
+            pick(dataArr[0], dataArr[1]);
+        } else if (dataArr.length == 1) {
+            pick(dataArr[0]);
+        }
+    };
 }
 
-function movieThis(movieName) {
-    request("http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy", function(error, response, body) {
-
-    if (!error && response.statusCode === 200) {
-
-        // Parse the body of the site and recover just the imdbRating
-        console.log("The movie's title: " + JSON.parse(body).Title +
-                    "\nYear of Release: " + JSON.parse(body).Year +
-                    "\nIMDB Rating: " + JSON.parse(body).imdbRating +
-                    "\nRotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value +
-                    "\nCountry where movie was produced: " + JSON.parse(body).Country +
-                    "\nLanguage: " + JSON.parse(body).Language +
-                    "\nPlot: " + JSON.parse(body).Plot +
-                    "\nFeatured Actors: " + JSON.parse(body).Actors
-                );
+// Switch statement that holds different arguments from user
+var pick = function(caseData, functionData) {
+    switch(caseData) {
+        case 'my-tweets' :
+            myTweets();
+            break;
+        case 'spotify-this-song':
+        spotifyThisSong(functionData);
+            break;
+        case 'movie-this':
+            movieThis(functionData);
+        case 'do-what-it-says':
+            doWhatItSays();
+            break;
+        default:
+        console.log("Invalid Command");
     }
-    });
 }
 
-// function to access "do what it says" from random.txt file
-function doWhatItSays() {
-	
-	// read record from random.txt file
-	fs.readFile('random.txt', "utf8", function(error, data){
+// Take arguments input into Liri and input them into pick function
+var runThis = function(argOne, argTwo) {
+    pick(argOne, argTwo);
+};
 
-		if (error) {
-    		return console.log(error);
-  		}
-	});
-}}
+// Referencing the arguments the user enters
+runThis(process.argv[2], process.argv[3]);
+
+
+
+
+
+
+
